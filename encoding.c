@@ -1595,6 +1595,40 @@ rb_enc_aliases(VALUE klass)
     return aliases[0];
 }
 
+/*
+ * An <code>Encoding</code> instance represents a character encoding usable in
+ * Ruby. They are defined as constants under the Encoding namespace, and each 
+ * one has a name and optionaly aliases:
+ *
+ *   Encoding::ISO_8859_1.name
+ *   => #<Encoding:ISO-8859-1>
+ *   
+ *   Encoding::ISO_8859_1.names
+ *   => ["ISO-8859-1", "ISO8859-1"]
+ *
+ * Ruby methods dealing with encodings return or take Encoding instances as 
+ * arguments (when a method accepts an Encoding instance as an argument, its
+ * name or alias can be passed instead).
+ *
+ *   "some string".encode(Encoding::ISO_8859_1)
+ *   => "some string"
+ *
+ *   "some string".encode("ISO-8859-1")
+ *   => "some string"
+ *
+ * The instances of various Ruby classes like <code>String</code>, <code>
+ * Symbol</code> or <code>Regexp</code> have an associated Encoding instance 
+ * that indicates their encoding:
+ *
+ *   "some string".encoding
+ *   => #<Encoding:UTF-8>
+ *   
+ * The Encoding <code>Encoding::ASCII_8BIT</code> is a special Encoding that 
+ * does not correspond to an existing character encoding. In fact it represents
+ * the absence of encoding and objects with this encoding can be seen as binary
+ * data.
+ */
+
 void
 Init_Encoding(void)
 {
