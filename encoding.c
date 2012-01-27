@@ -1623,6 +1623,30 @@ rb_enc_aliases(VALUE klass)
  * does not correspond to an existing character encoding. In fact it represents
  * the absence of encoding and objects with this encoding can be seen as binary
  * data.
+ *
+ * == Locale encoding
+ *
+ * All Ruby source code has an associated <code>Encoding</code> to which will 
+ * be associated any String litteral created in the source code. 
+ *
+ * By default the locale encoding is <code>Encoding:US-ASCII</code> but it can 
+ * changed by a magic comment placed on the first line (or second line, if 
+ * there is a shebang line on the first) of the source code file. The comment 
+ * must contain the word <code>coding</code> or <code>encoding</code>, 
+ * followed by a colon and space, and then the Encoding name:
+ *
+ *   # encoding: UTF-8
+ *
+ *   "some string".encoding
+ *   => #<Encoding:UTF-8>
+ *
+ * The <code>__ENCODING__</code> returns the locale encoding currently active:
+ *
+ *   # encoding: ISO-8859-1
+ *
+ *   __ENCODING__
+ *   => #<Encoding:ISO-8859-1>
+ *
  */
 
 void
