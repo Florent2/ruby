@@ -1652,8 +1652,9 @@ rb_enc_aliases(VALUE klass)
  *
  * Each IO object has an external encoding which indicates the actual encoding 
  * of the data. By default Ruby sets the external encoding of a IO object to 
- * the default external encoding (set from the user's environment or the 
- * <code>-E</code> option).
+ * the default external encoding (initialized from the user's environment or 
+ * set with the <code>-E</code> option or the 
+ * <code>Encoding.default_external=</code> method).
  *
  * When you know that the actual encoding of the data of your IO object is not
  * the default external encoding, you can reset its external encoding with 
