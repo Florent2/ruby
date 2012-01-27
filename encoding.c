@@ -1640,13 +1640,26 @@ rb_enc_aliases(VALUE klass)
  *   "some string".encoding
  *   => #<Encoding:UTF-8>
  *
- * The <code>__ENCODING__</code> returns the locale encoding currently active:
+ * The <code>__ENCODING__</code> keyword returns the locale encoding 
+ * currently active:
  *
  *   # encoding: ISO-8859-1
  *
  *   __ENCODING__
  *   => #<Encoding:ISO-8859-1>
  *
+ * == External encoding
+ *
+ * Each IO object has an external encoding which indicates the actual encoding 
+ * of the data. By default Ruby sets the external encoding of a IO object to 
+ * the default external encoding (set from the user's environment or the 
+ * <code>-E</code> option).
+ *
+ * When you know that the actual encoding of the data of your IO object is not
+ * the default external encoding, you can reset its external encoding with 
+ * <code>IO#set_encoding</code> or at set it at the moment of creating the IO 
+ * object (see <code>IO.new</code> or <code>File.new</code> for example).
+ * 
  */
 
 void
