@@ -1625,6 +1625,37 @@ rb_enc_aliases(VALUE klass)
  * correspond to any character encoding. In fact it represents the absence of 
  * encoding and objects with this encoding can be seen as binary data.
  *
+ * == Changing an encoding
+ *
+ * The associated Encoding of a String can can be changed in two different ways.
+ *
+ * First, it is possible to set the Encoding of a string to a new Encoding 
+ * without changing the internal byte representation of the string, with the 
+ * String#force_encoding method. This is how you can tell Ruby that another
+ * encoding is better suited to treat the string.
+ *
+ *   string
+ *   #=> "R\xC3\xA9sum\xC3\xA9"
+ *   string.encoding
+ *   #=> #<Encoding:ISO-8859-1>
+ *   string.force_encoding(Encoding:UTF-8)
+ *   #=> "Résumé"
+ *
+ * Second, it is possible to transcode a string, i.e. translate its internal
+ * byte representation to another encoding. Its associated encoding is also 
+ * set to the other encoding. See String#encode for the various forms of 
+ * transcoding, and the Encoding::Converter class for additional control over
+ * the transcoding process.
+ *
+ *   string = "some string"
+ *   #=> "some string"
+ *   string.encoding
+ *   #=> #<Encoding:UTF-8>
+ *   string.encode!(Encoding::ISO_8859_1)
+ *   #=> "some string"
+ *   string.encoding
+ *   #=> #<Encoding:ISO-8859-1>
+ *
  * == Locale encoding
  *
  * All Ruby source code has an associated Encoding which any String literal 
