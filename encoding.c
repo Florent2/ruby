@@ -1601,23 +1601,25 @@ rb_enc_aliases(VALUE klass)
  * optionaly, aliases:
  *
  *   Encoding::ISO_8859_1.name
- *   => #<Encoding:ISO-8859-1>
+ *   #=> #<Encoding:ISO-8859-1>
  *   
  *   Encoding::ISO_8859_1.names
- *   => ["ISO-8859-1", "ISO8859-1"]
+ *   #=> ["ISO-8859-1", "ISO8859-1"]
  *
  * Ruby methods dealing with encodings return or take Encoding instances as 
  * arguments (when a method accepts an Encoding instance as an argument, it can 
  * be passed an Encoding name or alias instead).
  *
  *   "some string".encoding
- *   => #<Encoding:UTF-8>
+ *   #=> #<Encoding:UTF-8>
  *
- *   "some string".encode(Encoding::ISO_8859_1)
- *   => "some string"
+ *   string = "some string".encode(Encoding::ISO_8859_1)
+ *   #=> "some string"
+ *   string.encoding
+ *   #=> #<Encoding:ISO-8859-1>
  *
  *   "some string".encode("ISO-8859-1")
- *   => "some string"
+ *   #=> "some string"
  *
  * <code>Encoding::ASCII_8BIT</code> is a special encoding that does not 
  * correspond to any character encoding. In fact it represents the absence of 
@@ -1628,8 +1630,8 @@ rb_enc_aliases(VALUE klass)
  * All Ruby source code has an associated Encoding which any String literal 
  * created in the source code will be associated to.
  *
- * The default locale encoding is <code>Encoding:US-ASCII</code>, but it can 
- * changed by a magic comment on the first line of the source code file (or 
+ * The default locale encoding is <code>Encoding::US-ASCII</code>, but it can 
+ * be changed by a magic comment on the first line of the source code file (or 
  * second line, if there is a shebang line on the first). The comment must 
  * contain the word <code>coding</code> or <code>encoding</code>, followed 
  * by a colon, space and the Encoding name or alias:
@@ -1637,7 +1639,7 @@ rb_enc_aliases(VALUE klass)
  *   # encoding: UTF-8
  *
  *   "some string".encoding
- *   => #<Encoding:UTF-8>
+ *   #=> #<Encoding:UTF-8>
  *
  * The <code>__ENCODING__</code> keyword returns the locale encoding that is
  * currently active:
@@ -1645,7 +1647,7 @@ rb_enc_aliases(VALUE klass)
  *   # encoding: ISO-8859-1
  *
  *   __ENCODING__
- *   => #<Encoding:ISO-8859-1>
+ *   #=> #<Encoding:ISO-8859-1>
  *
  * == External encoding
  *
@@ -1653,7 +1655,19 @@ rb_enc_aliases(VALUE klass)
  * Ruby will use to read its data. By default Ruby sets the external 
  * encoding of an IO object to the default external encoding (initialized from 
  * the user's environment, set with the interpreter <code>-E</code> option or 
- * the Encoding.default_external= method).
+ * the Encoding.default_external= method). Encoding.default_external returns
+ * the current value of the external encoding.
+ *
+ *    # Encoding.default_external
+ *    #=> #<Encoding:UTF-8>
+ *
+ *    $ ruby -E ISO-8859-1 -e "p Encoding.default_external"
+ *    #<Encoding:ISO-8859-1>
+ *
+ *    # Encoding.default_external = Encoding:ISO-8859-1
+ *    #=> #<Encoding:ISO-8859-1>
+ *    # Encoding.default_external
+ *    #=> #<Encoding:ISO-8859-1>
  *
  * When you know that the actual encoding of the data of an IO object is not
  * the default external encoding, you can reset its external encoding with 
@@ -1677,7 +1691,20 @@ rb_enc_aliases(VALUE klass)
  * encoding is +nil+ meaning that by default, no transcoding occurs.
  *
  * The default internal encoding can be set with the interpreter option
- * <code>-E</code> or Encoding.default_internal=.
+ * <code>-E</code> or Encoding.default_internal=. Encoding.default_internal
+ * returns the current value of the internal encoding.
+ *
+ *    $ ruby -E ISO-8859-1:UTF-8 -e "p [Encoding.default_external, \
+        Encoding.default_internal]"
+ *    [#<Encoding:ISO-8859-1>, #<Encoding:UTF-8>]
+ * 
+ *    # Encoding.default_internal
+ *    #=> nil
+ *    # Encoding.default_internal = Encoding::UTF_8
+ *    #=> #<Encoding:UTF-8>
+ *    # Encoding.default_internal
+ *    #=> #<Encoding:UTF-8>
+ *
  */
 
 void
