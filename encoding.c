@@ -1595,6 +1595,149 @@ rb_enc_aliases(VALUE klass)
     return aliases[0];
 }
 
+/*
+ * An Encoding instance represents a character encoding usable in Ruby. It is 
+ * defined as a constant under the Encoding namespace. It has a name and 
+ * optionaly, aliases:
+ *
+ *   Encoding::ISO_8859_1.name
+ *   #=> #<Encoding:ISO-8859-1>
+ *   
+ *   Encoding::ISO_8859_1.names
+ *   #=> ["ISO-8859-1", "ISO8859-1"]
+ *
+ * Ruby methods dealing with encodings return or take Encoding instances as 
+ * arguments (when a method accepts an Encoding instance as an argument, it can 
+ * be passed an Encoding name or alias instead).
+ *
+ *   "some string".encoding
+ *   #=> #<Encoding:UTF-8>
+ *
+ *   string = "some string".encode(Encoding::ISO_8859_1)
+ *   #=> "some string"
+ *   string.encoding
+ *   #=> #<Encoding:ISO-8859-1>
+ *
+ *   "some string".encode("ISO-8859-1")
+ *   #=> "some string"
+ *
+ * <code>Encoding::ASCII_8BIT</code> is a special encoding that does not 
+ * correspond to any character encoding. In fact it represents the absence of 
+ * encoding and objects with this encoding can be seen as binary data.
+ *
+ * == Changing an encoding
+ *
+ * The associated Encoding of a String can can be changed in two different ways.
+ *
+ * First, it is possible to set the Encoding of a string to a new Encoding 
+ * without changing the internal byte representation of the string, with the 
+ * String#force_encoding method. This is how you can tell Ruby that another
+ * encoding is better suited to treat the string.
+ *
+ *   string
+ *   #=> "R\xC3\xA9sum\xC3\xA9"
+ *   string.encoding
+ *   #=> #<Encoding:ISO-8859-1>
+ *   string.force_encoding(Encoding:UTF-8)
+ *   #=> "Résumé"
+ *
+ * Second, it is possible to transcode a string, i.e. translate its internal
+ * byte representation to another encoding. Its associated encoding is also 
+ * set to the other encoding. See String#encode for the various forms of 
+ * transcoding, and the Encoding::Converter class for additional control over
+ * the transcoding process.
+ *
+ *   string = "some string"
+ *   #=> "some string"
+ *   string.encoding
+ *   #=> #<Encoding:UTF-8>
+ *   string.encode!(Encoding::ISO_8859_1)
+ *   #=> "some string"
+ *   string.encoding
+ *   #=> #<Encoding:ISO-8859-1>
+ *
+ * == Locale encoding
+ *
+ * All Ruby source code has an associated Encoding which any String literal 
+ * created in the source code will be associated to.
+ *
+ * The default locale encoding is <code>Encoding::US-ASCII</code>, but it can 
+ * be changed by a magic comment on the first line of the source code file (or 
+ * second line, if there is a shebang line on the first). The comment must 
+ * contain the word <code>coding</code> or <code>encoding</code>, followed 
+ * by a colon, space and the Encoding name or alias:
+ *
+ *   # encoding: UTF-8
+ *
+ *   "some string".encoding
+ *   #=> #<Encoding:UTF-8>
+ *
+ * The <code>__ENCODING__</code> keyword returns the locale encoding that is
+ * currently active:
+ *
+ *   # encoding: ISO-8859-1
+ *
+ *   __ENCODING__
+ *   #=> #<Encoding:ISO-8859-1>
+ *
+ * == External encoding
+ *
+ * Each IO object has an external encoding which indicates the encoding that 
+ * Ruby will use to read its data. By default Ruby sets the external 
+ * encoding of an IO object to the default external encoding (initialized from 
+ * the user's environment, set with the interpreter <code>-E</code> option or 
+ * the Encoding.default_external= method). Encoding.default_external returns
+ * the current value of the external encoding.
+ *
+ *    # Encoding.default_external
+ *    #=> #<Encoding:UTF-8>
+ *
+ *    $ ruby -E ISO-8859-1 -e "p Encoding.default_external"
+ *    #<Encoding:ISO-8859-1>
+ *
+ *    # Encoding.default_external = Encoding:ISO-8859-1
+ *    #=> #<Encoding:ISO-8859-1>
+ *    # Encoding.default_external
+ *    #=> #<Encoding:ISO-8859-1>
+ *
+ * When you know that the actual encoding of the data of an IO object is not
+ * the default external encoding, you can reset its external encoding with 
+ * IO#set_encoding or set it at IO object creation (see IO.new options).
+ *
+ * == Internal encoding
+ *
+ * To process the data of an IO object which has an encoding different 
+ * from its external encoding, you can set its internal encoding. Ruby will use
+ * this internal encoding to transcode the data when it is read from the IO
+ * object.
+ *
+ * Conversely when data is written to the IO object, it is transcoded from the 
+ * internal encoding to the external encoding of the IO object.
+ *
+ * The internal encoding of an IO object can be set with 
+ * IO#set_encoding or at IO object creation (see IO.new options).
+ *
+ * The internal encoding is optional and when not set, the Ruby default 
+ * internal encoding is used. If not explicitly set this default internal 
+ * encoding is +nil+ meaning that by default, no transcoding occurs.
+ *
+ * The default internal encoding can be set with the interpreter option
+ * <code>-E</code> or Encoding.default_internal=. Encoding.default_internal
+ * returns the current value of the internal encoding.
+ *
+ *    $ ruby -E ISO-8859-1:UTF-8 -e "p [Encoding.default_external, \
+        Encoding.default_internal]"
+ *    [#<Encoding:ISO-8859-1>, #<Encoding:UTF-8>]
+ * 
+ *    # Encoding.default_internal
+ *    #=> nil
+ *    # Encoding.default_internal = Encoding::UTF_8
+ *    #=> #<Encoding:UTF-8>
+ *    # Encoding.default_internal
+ *    #=> #<Encoding:UTF-8>
+ *
+ */
+
 void
 Init_Encoding(void)
 {
